@@ -45,65 +45,67 @@ def main():
     print('\n{} transaction successfully categorized and booked!'.format(
         len(transactions) - len(uncategorized_trans)
     ))
-    print('{} unknown transactions:'.format(
-        len(uncategorized_trans)
-    ))
-    print('===================================================')
-    for ii,tran in enumerate(uncategorized_trans):
-        details = tran.split(',')
-        debit,credit = 0,0
-        try: debit = float(details[3])
-        except ValueError as e: pass
-        try: credit = float(details[4])
-        except ValueError as e: pass
-        amount = '-{}'.format(debit) if debit > credit else '+{}'.format(credit)
-        desc = [d for d in details[2].split(' ') if d != '']
-        new_desc = []
-        for ii in range(len(desc)): 
-            new_desc.append(desc[ii])
-            new_desc.append(' ')
-        desc = ''.join(new_desc)
-        print('{}. {}   {}'.format(
-            ii+1, desc, amount
+
+    if len(uncategorized_trans) > 0:
+        print('{} unknown transactions:'.format(
+            len(uncategorized_trans)
         ))
+        print('===================================================')
+        for ii,tran in enumerate(uncategorized_trans):
+            details = tran.split(',')
+            debit,credit = 0,0
+            try: debit = float(details[3])
+            except ValueError as e: pass
+            try: credit = float(details[4])
+            except ValueError as e: pass
+            amount = '-${}'.format(debit) if debit > credit else '+${}'.format(credit)
+            desc = [d for d in details[2].split(' ') if d != '']
+            new_desc = []
+            for ii in range(len(desc)): 
+                new_desc.append(desc[ii])
+                new_desc.append(' ')
+            desc = ''.join(new_desc)
+            print('{}. {}   {}'.format(
+                ii+1, desc, amount
+            ))
     
-    # user option: 'other' category or dump to file?
-    print('\nWhat would you like to do with these transactions?')
-    print('1) Add to \'Other\' Category   2) Dump to file   3) Discard')
+        # user option: 'other' category or dump to file?
+        print('\nWhat would you like to do with these transactions?')
+        print('1) Add to \'Other\' Category   2) Dump to file   3) Discard')
     
-    op = -1
-    while op not in range(1, 4):
-        try:
-            op = int(input())
-        except ValueError:
-            print('try an integer')
-            
-        if op == 1:
-            for tran in uncategorized_trans:
-                try:
-                    if tran != '' and tran != None:
-                        d = tran.split(',')
-                        debit,credit = 0,0
-                        try: debit = float(d[3])
-                        except ValueError as e: pass
-                        try: credit = float(d[4])
-                        except ValueError as e: pass
-                        if debit > credit: typ = 'EXP'
-                        else: typ = 'INC'
-                        booker.insert(d[1], debit, credit, (typ, 'Other', 50))
-                except bk.BookkeeperError as e:
-                    print(str(e))
-        elif op == 2:
+        op = -1
+        while op not in range(1, 4):
             try:
-                save = open('unknown-transactions.csv', 'w')
-                for tran in uncategorized_trans: 
-                    save.write(tran)
-                    save.write('\n')
-                save.close()
-            except IOError as e:
-                print(str(e))
-        elif op == 3:
-            pass # discard
+                op = int(input())
+            except ValueError:
+                print('try an integer')
+            
+            if op == 1:
+                for tran in uncategorized_trans:
+                    try:
+                        if tran != '' and tran != None:
+                            d = tran.split(',')
+                            debit,credit = 0,0
+                            try: debit = float(d[3])
+                            except ValueError as e: pass
+                            try: credit = float(d[4])
+                            except ValueError as e: pass
+                            if debit > credit: typ = 'EXP'
+                            else: typ = 'INC'
+                            booker.insert(d[1], debit, credit, (typ, 'Other', 50))
+                    except bk.BookkeeperError as e:
+                        print(str(e))
+            elif op == 2:
+                try:
+                    save = open('unknown-transactions.csv', 'w')
+                    for tran in uncategorized_trans: 
+                        save.write(tran)
+                        save.write('\n')
+                    save.close()
+                except IOError as e:
+                    print(str(e))
+            elif op == 3:
+                pass # discard
     
     # save and close excel sheet        
     booker.close()
@@ -117,8 +119,13 @@ def get_transactions(filename):
         raise IOError('Provided file is invalid')
     
     trans = data.split('\n')
-    trans = [tran for tran in trans if 'tfr westpac' not in tran.split(',')[2].lower()]
-    return trans[1:] # skip header row
+    try:
+        trans = [tran for tran in trans if 'tfr westpac' not in tran.split(',')[2].lower()]
+    except IndexError:
+        pass
+    if len(trans) == 0:
+        raise IOError('{} is empty'.format(filename))
+    return trans[1:] # remove header row
 
 if __name__ == '__main__':
     main()
