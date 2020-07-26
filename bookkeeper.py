@@ -13,9 +13,9 @@ class Bookkeeper:
         self.tabs       = {'inc' : 3, 'exp' : 22} # category-start_row mappings
         self.curr_row   = self.tabs['inc']
     
-    def categorize(self, transaction): #TODO not working
+    def categorize(self, transaction):
         '''
-        Check which keywords appear in the transaction description, and assign
+        Check which patterns appear in the transaction description, and assign
         the appropriately mapped category tuple.
         Raises BookkeeperError if the transaction could not be categorized.
         For this function to work, call 'build_vocab()' first.
@@ -126,6 +126,7 @@ class Bookkeeper:
         mappings = dict()
         for ln in vocab_file_lines:
             data = ln.split(',')
+            print(data)
             cat = (data[0], data[1], float(data[2])) # (type, category, budget/estimate)
             for key in data[3:]:
                 mappings[key.lower()] = cat

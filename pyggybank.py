@@ -10,8 +10,8 @@ def main():
         sys.exit(0)
     
     # important files that should be in the directory
-    FL_DATA = 'Data.csv'
-    FL_BOOK = 'Budget_{}_{}.xlsx'.format(sys.argv[1].upper(), sys.argv[2]) # month, yr
+    FL_DATA = 'data/Data_{}.csv'.format(sys.argv[1])
+    FL_BOOK = 'sheets/Budget_{}_{}.xlsx'.format(sys.argv[1].upper(), sys.argv[2]) # month, yr
     FL_VOCAB = 'pyggy-vocab.csv'
      
     # init bot   
@@ -42,8 +42,8 @@ def main():
             uncategorized_trans.append(tran)
             
     # output results
-    print('\n{} transaction successfully categorized and booked!'.format(
-        len(transactions) - len(uncategorized_trans)
+    print('\n{}\{} transaction successfully categorized and booked!'.format(
+        len(transactions) - len(uncategorized_trans), len(transactions)
     ))
 
     if len(uncategorized_trans) > 0:
@@ -117,15 +117,17 @@ def get_transactions(filename):
         fl.close()
     except IOError:
         raise IOError('Provided file is invalid')
-    
     trans = data.split('\n')
-    try:
-        trans = [tran for tran in trans if 'tfr westpac' not in tran.split(',')[2].lower()]
-    except IndexError:
-        pass
-    if len(trans) == 0:
+    trans_filtered = []
+    for ii in range(len(trans)):
+        try:
+            if 'tfr westpac' not in trans[ii].split(',')[2].lower():
+                trans_filtered.append(trans[ii])
+        except IndexError:
+            pass
+    if len(trans_filtered) == 0:
         raise IOError('{} is empty'.format(filename))
-    return trans[1:] # remove header row
+    return trans_filtered[1:] # remove header row
 
 if __name__ == '__main__':
     main()

@@ -5,6 +5,6 @@ EXP,Rent,600,some address - rent
 EXP,Mobile Data,30,telstra
 EXP,Internet,25,internet
 EXP,Insurance,15,allianz insure
-EXP,Fuel,200,bp,shell
-EXP,Groceries,200,coles,woolworths,iga
-EXP,Purchased Meals,100,subway,mcdonalds
+EXP,Fuel,200,bp,shell,puma
+EXP,Groceries,200,coles,woolworths,iga,aldi
+EXP,Purchased Meals,100,subway,mcdonalds,dominos,dome
