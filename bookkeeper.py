@@ -123,10 +123,10 @@ class Bookkeeper:
         except IOError as e:
             raise BookkeeperError('Provided file is invalid')
         
+        vocab_file_lines.pop(-1)
         mappings = dict()
         for ln in vocab_file_lines:
             data = ln.split(',')
-            print(data)
             cat = (data[0], data[1], float(data[2])) # (type, category, budget/estimate)
             for key in data[3:]:
                 mappings[key.lower()] = cat
